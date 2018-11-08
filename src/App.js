@@ -14,8 +14,116 @@ import './assets/css/pe-icon-7-stroke.css';
 
 import './bootstrap.min.css';
 
+var firebase = require("firebase");
+
+
+
+
+var config = {
+    apiKey: "AIzaSyAo-Do06FeQP0_Y82duXHLRpQpmf9cRr60",
+    authDomain: "tuatan-d9ede.firebaseapp.com",
+    databaseURL: "https://tuatan-d9ede.firebaseio.com",
+    projectId: "tuatan-d9ede",
+    storageBucket: "tuatan-d9ede.appspot.com",
+    messagingSenderId: "491178828414"
+  };
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(config);
+}
+
+
+
+
 class App extends Component {
+
+
+  constructor(){
+        super();
+        this.state = {
+          ProductList: {},
+        }
+
+        this.ProductListRender = this.ProductListRender.bind(this);
+
+    }
+  componentWillMount() {
+
+  
+  }
+
+
+  componentDidMount() {
+
+
+
+var date = new Date();
+
+    var rootRef = firebase.database().ref('/Product');
+    var newChildRef = rootRef.push();
+    // we can get its id using key()
+    // console.log('my new shiny id is '+newChildRef.key());
+    // now it is appended at the end of data at the server
+    newChildRef.set({foo: date.getHours()+":"+date.getMinutes()});
+
+
+var that=this;
+ firebase.database().ref('/Product').on('value', function(snapshot) {
+  console.log(snapshot.val());
+  that.setState({ProductList:snapshot.val()});
+
+ 
+
+});
+    
+  }
+
+ ProductListRender() {
+
+        var ProductList = this.state.ProductList ? this.state.ProductList :{} ;
+        var array=[];
+        var EachFive=[];
+        //array.push(<div>);
+
+
+
+        for(var item in ProductList) {
+            if (ProductList.hasOwnProperty(item)){
+                console.log(ProductList[item]);
+                if (EachFive.length==5) {
+                    array.push(<div class="carousel-item text-center">{EachFive}</div>);
+                    EachFive=[];
+                }
+                EachFive.push(<figure class="col-md-2 col-md-offset-1 d-md-inline-block col-sm-5 d-sm-inline-block col-xs-4 d-xs-inline-block">
+                                <div class="card">
+                                <img class="card-img-top img-fluid hidden-xs" alt={item.foo}/>
+                                <p class="textImage"> {ProductList[item].foo} </p>
+                                <ul class="list-inline"> 
+                                    <i class ="icon" data-feather="thumbs-up"></i>
+                                    <i class = "icon" data-feather="heart"></i>
+                                    <i class = "icon" data-feather="message-circle"></i>
+                                    <i class = "icon" data-feather="eye"></i>
+                                </ul>
+                                </div>
+                            </figure>);
+            }
+
+        }
+
+        //array.push(</div>);
+
+        return array;
+
+        }
+
+
+
   render() {
+
+ 
+
+
+
     return (
       <div className="App">
         <header>
@@ -211,10 +319,16 @@ class App extends Component {
     {/*<!-- Top 10 Shop Carousel Image -->*/}
     <br />
     <div id="top10Content" class="carousel slide carousel-multi-item" data-ride="carousel">
+       
+        
         <div class="carousel-inner mdb-lightbox" role="listbox">
             <div id="mdb-lightbox-ui"></div>
+
+
             {/*<!-- First slide (Trying different size of images) -->*/}
+            
             <div class=" carousel-item active text-center">
+
                 <figure class="col-md-2 col-md-offset-1 d-md-inline-block col-sm-5 d-sm-inline-block col-xs-4 d-xs-inline-block">
                     <div class="card">
                         <img class="card-img-top img-fluid hidden-xs" src="data:image/jpeg;base64,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"
@@ -228,6 +342,7 @@ class App extends Component {
                         </ul>
                     </div>
                 </figure>
+                
                 <figure class="col-md-2 d-md-inline-block col-sm-5 d-sm-inline-block">
                     <div class="card">
                         <img class="card-img-top" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmrHrHw9dFfMpN2mDYXWxm-prGNTe4viNf_r5C9RJuCc5tanq_uQ"
@@ -281,6 +396,7 @@ class App extends Component {
                     </div>              
                 </figure>
             </div>
+            {this.ProductListRender()}
         {/*<!-- Second slide -->*/}
             <div class="carousel-item text-center">
                 <figure class="col-md-2 col-md-offset-1 d-md-inline-block col-sm-5 d-sm-inline-block">
